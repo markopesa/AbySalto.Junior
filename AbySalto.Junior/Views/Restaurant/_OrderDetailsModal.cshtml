@@ -1,0 +1,99 @@
+﻿@model AbySalto.Junior.ViewModels.OrderDetailsViewModel
+
+<div class="modal-header bg-primary text-white">
+    <h5 class="modal-title">Detalji narudžbe #@Model.Order.Id</h5>
+    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+</div>
+
+<div class="modal-body">
+    <div class="row">
+        <div class="col-md-6">
+            <h6><strong>Informacije o kupcu</strong></h6>
+            <table class="table table-sm">
+                <tr>
+                    <td><strong>Ime:</strong></td>
+                    <td>@Model.Order.CustomerName</td>
+                </tr>
+                <tr>
+                    <td><strong>Kontakt:</strong></td>
+                    <td>@Model.Order.ContactNumber</td>
+                </tr>
+                <tr>
+                    <td><strong>Adresa dostave:</strong></td>
+                    <td>@Model.Order.DeliveryAddress</td>
+                </tr>
+            </table>
+        </div>
+        <div class="col-md-6">
+            <h6><strong>Informacije o narudžbi</strong></h6>
+            <table class="table table-sm">
+                <tr>
+                    <td><strong>Status:</strong></td>
+                    <td><span class="badge bg-info">@Model.Order.OrderStatus.Name</span></td>
+                </tr>
+                <tr>
+                    <td><strong>Način plaćanja:</strong></td>
+                    <td>@Model.Order.PaymentMethod.Name</td>
+                </tr>
+                <tr>
+                    <td><strong>Datum narudžbe:</strong></td>
+                    <td>@Model.Order.OrderTime.ToString("dd.MM.yyyy HH:mm")</td>
+                </tr>
+                <tr>
+                    <td><strong>Ukupan iznos:</strong></td>
+                    <td><strong>@Model.Order.TotalAmount.ToString("F2") @Model.Order.Currency</strong></td>
+                </tr>
+            </table>
+        </div>
+    </div>
+
+    @if (!string.IsNullOrEmpty(Model.Order.Note))
+    {
+        <div class="row mt-3">
+            <div class="col-12">
+                <h6><strong>Napomena:</strong></h6>
+                <div class="alert alert-info">
+                    @Model.Order.Note
+                </div>
+            </div>
+        </div>
+    }
+
+    <div class="row mt-3">
+        <div class="col-12">
+            <h6><strong>Stavke narudžbe:</strong></h6>
+            <table class="table table-striped">
+                <thead class="table-dark">
+                    <tr>
+                        <th>Naziv</th>
+                        <th>Količina</th>
+                        <th>Cijena</th>
+                        <th>Ukupno</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in Model.Order.Items)
+                    {
+                        <tr>
+                            <td>@item.ItemName</td>
+                            <td>@item.Quantity</td>
+                            <td>@item.Price.ToString("F2") @Model.Order.Currency</td>
+                            <td><strong>@item.Total.ToString("F2") @Model.Order.Currency</strong></td>
+                        </tr>
+                    }
+                </tbody>
+                <tfoot class="table-dark">
+                    <tr>
+                        <th colspan="3">UKUPNO:</th>
+                        <th>@Model.Order.TotalAmount.ToString("F2") @Model.Order.Currency</th>
+                    </tr>
+                </tfoot>
+            </table>
+        </div>
+    </div>
+</div>
+
+<div class="modal-footer">
+    <button type="button" class="btn btn-warning">Uredi narudžbu</button>
+    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Zatvori</button>
+</div>
