@@ -61,5 +61,63 @@ namespace AbySalto.Junior.Controllers
                 return BadRequest("Greška prilikom dohvaćanja detalja narudžbe");
             }
         }
+        [HttpGet]
+        public async Task<IActionResult> Create()
+        {
+            try
+            {
+                var viewModel = new CreateOrderViewModel();
+                await viewModel.PrepareSelectLists(_orderRepository); 
+
+                return View(viewModel);
+            }
+            catch (Exception e)
+            {
+                var errorModel = new ErrorViewModel
+                {
+                    Message = "Greška prilikom učitavanja forme za novu narudžbu",
+                    Url = Request.GetDisplayUrl()
+                };
+                return View("Error", errorModel);
+            }
+        }
+        [HttpPost]
+        public async Task<IActionResult> Create(CreateOrderViewModel model)
+        {
+            try
+            {
+                if (!ModelState.IsValid)
+                {
+                    await model.PrepareSelectLists(_orderRepository);
+                    return View(model);
+                }
+
+                await model.SaveOrder(_orderRepository);
+
+                TempData["SuccessMessage"] = "Narudžba je uspješno kreirana!";
+                return RedirectToAction("Index");
+            }
+            catch (Exception e)
+            {
+                await model.PrepareSelectLists(_orderRepository);
+                ModelState.AddModelError("", "Greška prilikom snimanja narudžbe");
+                return View(model);
+            }
+        }
+        [HttpGet]
+        public IActionResult GetOrderItemPartial(int index)
+        {
+            try
+            {
+                var viewModel = new CreateOrderItemViewModel();
+                ViewBag.Index = index;
+
+                return PartialView("_OrderItemPartial", viewModel);
+            }
+            catch (Exception e)
+            {
+                return BadRequest("Greška prilikom dohvaćanja stavke");
+            }
+        }
     }
 }

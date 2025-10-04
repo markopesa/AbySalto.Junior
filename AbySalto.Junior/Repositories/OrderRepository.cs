@@ -13,9 +13,27 @@ namespace AbySalto.Junior.Repositories
             _context = context;
         }
 
-        public Task<Order> AddAsync(Order order)
+        public async Task<List<OrderStatus>> GetAllOrderStatusesAsync()
         {
-            throw new NotImplementedException();
+            return await _context.OrderStatuses
+                .Where(x => !x.IsDeleted)
+                .OrderBy(x => x.Name)
+                .ToListAsync();
+        }
+
+        public async Task<List<PaymentMethod>> GetAllPaymentMethodsAsync()
+        {
+            return await _context.PaymentMethods
+                .Where(x => !x.IsDeleted)
+                .OrderBy(x => x.Name)
+                .ToListAsync();
+        }
+
+        public async Task<Order> AddAsync(Order order)
+        {
+            _context.Orders.Add(order);
+            await _context.SaveChangesAsync();
+            return order;
         }
 
         public Task DeleteAsync(int id)

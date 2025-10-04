@@ -1,0 +1,27 @@
+﻿@model AbySalto.Junior.ViewModels.CreateOrderItemViewModel
+
+@{
+    var index = ViewBag.Index ?? 0;
+}
+
+<div class="row align-items-end mb-3 order-item" data-index="@index">
+    <div class="col-md-4">
+        <label class="form-label">Naziv stavke *</label>
+        <input name="Items[@index].ItemName" class="form-control" placeholder="Naziv proizvoda">
+    </div>
+    <div class="col-md-2">
+        <label class="form-label">Količina *</label>
+        <input name="Items[@index].Quantity" type="number" class="form-control js-quantity" min="1" value="1">
+    </div>
+    <div class="col-md-2">
+        <label class="form-label">Cijena *</label>
+        <input name="Items[@index].Price" type="number" step="0.01" class="form-control js-price" min="0.01">
+    </div>
+    <div class="col-md-2">
+        <label class="form-label">Ukupno</label>
+        <input type="text" class="form-control js-total" readonly value="0.00">
+    </div>
+    <div class="col-md-2">
+        <button type="button" class="btn btn-danger btn-sm js-removeItem">Ukloni</button>
+    </div>
+</div>
