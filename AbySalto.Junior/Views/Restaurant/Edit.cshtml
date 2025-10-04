@@ -1,0 +1,184 @@
+﻿@model AbySalto.Junior.ViewModels.EditOrderViewModel
+
+@{
+    ViewData["Title"] = "Uredi narudžbu";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="row">
+    <div class="col-md-8">
+        <h2> Uređivanje narudžbe #@Model.Id</h2>
+    </div>
+    <div class="col-md-4 text-end">
+        <a href="@Url.Action("Index", "Restaurant")" class="btn btn-secondary">
+            ← Povratak na listu
+        </a>
+    </div>
+</div>
+
+<form asp-action="Edit" method="post" class="needs-validation" novalidate>
+    <input asp-for="Id" type="hidden" />
+
+    <div class="card mt-4">
+        <div class="card-header bg-primary text-white">
+            <h5>Osnovne informacije</h5>
+        </div>
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="mb-3">
+                        <label asp-for="CustomerName" class="form-label">Ime kupca *</label>
+                        <input asp-for="CustomerName" class="form-control">
+                        <span asp-validation-for="CustomerName" class="text-danger"></span>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="mb-3">
+                        <label asp-for="ContactNumber" class="form-label">Kontakt broj *</label>
+                        <input asp-for="ContactNumber" class="form-control">
+                        <span asp-validation-for="ContactNumber" class="text-danger"></span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="mb-3">
+                <label asp-for="DeliveryAddress" class="form-label">Adresa dostave *</label>
+                <input asp-for="DeliveryAddress" class="form-control">
+                <span asp-validation-for="DeliveryAddress" class="text-danger"></span>
+            </div>
+
+            <div class="row">
+                <div class="col-md-4">
+                    <div class="mb-3">
+                        <label asp-for="OrderStatusId" class="form-label">Status narudžbe *</label>
+                        <select asp-for="OrderStatusId" asp-items="Model.OrderStatuses" class="form-select">
+                            <option value="">-- Odaberite status --</option>
+                        </select>
+                        <span asp-validation-for="OrderStatusId" class="text-danger"></span>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="mb-3">
+                        <label asp-for="PaymentMethodId" class="form-label">Način plaćanja *</label>
+                        <select asp-for="PaymentMethodId" asp-items="Model.PaymentMethods" class="form-select">
+                            <option value="">-- Odaberite način plaćanja --</option>
+                        </select>
+                        <span asp-validation-for="PaymentMethodId" class="text-danger"></span>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="mb-3">
+                        <label asp-for="Currency" class="form-label">Valuta</label>
+                        <input asp-for="Currency" class="form-control" readonly>
+                    </div>
+                </div>
+            </div>
+
+            <div class="mb-3">
+                <label asp-for="Note" class="form-label">Napomena</label>
+                <textarea asp-for="Note" class="form-control" rows="3" placeholder="Dodatne napomene..."></textarea>
+                <span asp-validation-for="Note" class="text-danger"></span>
+            </div>
+        </div>
+    </div>
+
+    <div class="card mt-4">
+        <div class="card-header bg-success text-white d-flex justify-content-between align-items-center">
+            <h5>Stavke narudžbe</h5>
+            <button type="button" class="btn btn-light btn-sm js-addItem">
+                + Dodaj stavku
+            </button>
+        </div>
+        <div class="card-body">
+            <div id="orderItems">
+                @for (int i = 0; i < Model.Items.Count; i++)
+                {
+                    <div class="row align-items-end mb-3 order-item" data-index="@i">
+                        <div class="col-md-4">
+                            <label class="form-label">Naziv stavke *</label>
+                            <input asp-for="Items[i].ItemName" class="form-control" placeholder="Naziv proizvoda">
+                            <span asp-validation-for="Items[i].ItemName" class="text-danger"></span>
+                        </div>
+                        <div class="col-md-2">
+                            <label class="form-label">Količina *</label>
+                            <input asp-for="Items[i].Quantity" type="number" class="form-control js-quantity" min="1">
+                            <span asp-validation-for="Items[i].Quantity" class="text-danger"></span>
+                        </div>
+                        <div class="col-md-2">
+                            <label class="form-label">Cijena *</label>
+                            <input asp-for="Items[i].Price" type="number" step="0.01" class="form-control js-price" min="0.01">
+                            <span asp-validation-for="Items[i].Price" class="text-danger"></span>
+                        </div>
+                        <div class="col-md-2">
+                            <label class="form-label">Ukupno</label>
+                            <input type="text" class="form-control js-total" readonly>
+                        </div>
+                        <div class="col-md-2">
+                            <button type="button" class="btn btn-danger btn-sm js-removeItem">Ukloni</button>
+                        </div>
+                    </div>
+                }
+            </div>
+
+            <div class="row mt-4">
+                <div class="col-md-8"></div>
+                <div class="col-md-4">
+                    <div class="card bg-light">
+                        <div class="card-body">
+                            <h5>Ukupan iznos: <span id="grandTotal">0.00 EUR</span></h5>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row mt-4 mb-4">
+        <div class="col-12 text-end">
+            <button type="submit" class="btn btn-primary btn-lg">
+                Ažuriraj narudžbu
+            </button>
+            <a href="@Url.Action("Index", "Restaurant")" class="btn btn-secondary btn-lg ms-2">
+                Odustani
+            </a>
+        </div>
+    </div>
+</form>
+
+@section Scripts {
+    <script>
+        let itemIndex = @Model.Items.Count;
+
+        $(document).ready(function() {
+            calculateTotals();
+
+            $('.js-addItem').click(function() {
+                $.get('@Url.Action("GetEditItemPartial", "Restaurant")', { index: itemIndex })
+                    .done(function(html) {
+                        $('#orderItems').append(html);
+                        itemIndex++;
+                    });
+            });
+
+            $(document).on('click', '.js-removeItem', function() {
+                $(this).closest('.order-item').remove();
+                calculateTotals();
+            });
+
+            $(document).on('input', '.js-quantity, .js-price', calculateTotals);
+        });
+
+        function calculateTotals() {
+            let grandTotal = 0;
+            $('.order-item').each(function() {
+                const qty = parseFloat($(this).find('.js-quantity').val()) || 0;
+                const price = parseFloat($(this).find('.js-price').val()) || 0;
+                const total = qty * price;
+
+                $(this).find('.js-total').val(total.toFixed(2));
+                grandTotal += total;
+            });
+            $('#grandTotal').text(grandTotal.toFixed(2) + ' EUR');
+        }
+    </script>
+}

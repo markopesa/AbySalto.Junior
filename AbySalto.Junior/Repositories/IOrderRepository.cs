@@ -12,5 +12,6 @@ namespace AbySalto.Junior.Repositories
         Task<Order?> GetByIdAsync(int id);
         Task UpdateAsync(Order order);
         Task DeleteAsync(int id);
+        Task SaveChangesAsync();
     }
 }

@@ -68,5 +68,9 @@ namespace AbySalto.Junior.Repositories
         {
             throw new NotImplementedException();
         }
+        public async Task SaveChangesAsync()
+        {
+            await _context.SaveChangesAsync();
+        }
     }
 }

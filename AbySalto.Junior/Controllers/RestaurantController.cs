@@ -119,5 +119,85 @@ namespace AbySalto.Junior.Controllers
                 return BadRequest("Greška prilikom dohvaćanja stavke");
             }
         }
+        [HttpGet]
+        public async Task<IActionResult> Edit(int id)
+        {
+            try
+            {
+                var order = await _orderRepository.GetByIdWithDetailsAsync(id);
+                if (order == null)
+                    return NotFound("Narudžba nije pronađena");
+
+                var viewModel = new EditOrderViewModel
+                {
+                    Id = order.Id,
+                    CustomerName = order.CustomerName,
+                    ContactNumber = order.ContactNumber,
+                    DeliveryAddress = order.DeliveryAddress,
+                    Note = order.Note,
+                    OrderStatusId = order.OrderStatusId,
+                    PaymentMethodId = order.PaymentMethodId,
+                    Currency = order.Currency,
+                    Items = order.Items.Select(x => new EditOrderItemViewModel
+                    {
+                        ItemName = x.ItemName,
+                        Quantity = x.Quantity,
+                        Price = x.Price
+                    }).ToList()
+                };
+
+                await viewModel.PrepareSelectLists(_orderRepository);
+                return View(viewModel);
+            }
+            catch (Exception e)
+            {
+                var errorModel = new ErrorViewModel
+                {
+                    Message = "Greška prilikom učitavanja narudžbe za uređivanje",
+                    Url = Request.GetDisplayUrl()
+                };
+                return View("Error", errorModel);
+            }
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> Edit(EditOrderViewModel model)
+        {
+            try
+            {
+                if (!ModelState.IsValid)
+                {
+                    await model.PrepareSelectLists(_orderRepository);
+                    return View(model);
+                }
+
+                await model.UpdateOrder(_orderRepository);
+
+                TempData["SuccessMessage"] = "Narudžba je uspješno ažurirana!";
+                return RedirectToAction("Index");
+            }
+            catch (Exception e)
+            {
+                await model.PrepareSelectLists(_orderRepository);
+                ModelState.AddModelError("", "Greška prilikom ažuriranja narudžbe");
+                return View(model);
+            }
+        }
+
+        [HttpGet]
+        public IActionResult GetEditItemPartial(int index)
+        {
+            try
+            {
+                var viewModel = new EditOrderItemViewModel();
+                ViewBag.Index = index;
+
+                return PartialView("_EditOrderItemPartial", viewModel);
+            }
+            catch (Exception e)
+            {
+                return BadRequest("Greška prilikom dohvaćanja stavke");
+            }
+        }
     }
 }
